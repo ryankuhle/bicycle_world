@@ -1,68 +1,124 @@
 
-class Bicycle(object):
+class Bicycle():
     """
     Bicycle instances define information about a bicycle model.
     """
-    def __init__(self, model_name="", weight=0, production_cost=0):
-        self.model_name = model_name
+    def __init__(self, model, weight, cost):
+        self.model = model
         self.weight = weight
-        self.production_cost = production_cost
+        self.cost = cost
         
-class BikeShop(object): # 1 bike shop with 6 bike models
+    def __repr__(self):
+        """Return string representation of Bicycle object.
+        Includes the name of the class (Bicycle), the model, the weight, and the cost
+        """
+        return "%s(model=%r, weight=%r, cost=%r)" % (self.__class__.__name__, self.model, self.weight, self.cost)        
+        
+class BikeShop():
     """
     BikeShop instances define information about individual bike shop.
     """
-    def __init__(self, name="", model_types=0, markup=0, profit=0):
+    def __init__(self, name):
         self.name = name
-        self.model_types = model_types
-        self.markup = markup
-        self.profit = profit
+        self.inventory = []
+        self.markup = 0.2
+        self.store_profit = 0
+        
+    def set_inventory(self, bike_name):
+        self.inventory.append(bike_name)
 
-class Customer(object): # name, budget, whether or not they are allowed to purchase
-    """
-    Customer instances define information about an individual customer.
-    """
-    def __init__(self, name="", budget=0, status=True):
+    def show_inventory(self):
+        return self.inventory
+
+    def calc_profit(self, selected_bike):
+        self.sel_bike = self.inventory[selected_bike]
+        self.store_profit += self.sel_bike.cost * self.markup
+        return self.store_profit
+
+    def sell_bike(self, choice):
+        self.selection = self.inventory.pop(choice)
+        return self.selection        
+
+class Customer():
+    def __init__(self, name, money):
         self.name = name
-        self.budget = budget
-        self.status = status
+        self.money = money
+        self.bike_list = []
+
+    def bikes_avail(self, bike):
+        if bike.cost <= self.money:
+            self.bike_list.append(bike.model)
+
+    def show_bikes_avail(self):
+        return self.bike_list
+
+    def purchase(self):
+        self.bike_choice = input("Which would you like to purchase? ")
+        if self.bike_choice == "Corvair":
+            self.selected_bike = 0
+        elif self.bike_choice == "Airstream":
+            self.selected_bike = 1
+        elif self.bike_choice == "Slipstream":
+            self.selected_bike = 2
+        elif self.bike_choice == "Monty":
+            self.selected_bike = 3
+        elif self.bike_choice == "Zuul":
+            self.selected_bike = 4
+        elif self.bike_choice == "Ratman":
+            self.selected_bike = 5
+        else:
+            print ("You gave an invalid selection")
+            
+        shop.calc_profit(self.selected_bike)
+
+        self.sold_bike = shop.sell_bike(self.selected_bike)
+        print(self.sold_bike)
+        print("Money left in pocket: $" + str(self.money - self.sold_bike.cost))
         
-        
-# fire one instance of bike shops with 6 different models in stock, price should be 20% above  production cost
-
-"""
-# BIKESHOP INSTANCES
-bikeshop1 = BikeShop()
-bikeshop1.name = "Excite Bike"
-bikeshop1.model_types = 6
-bikeshop1.markup = 20 # Percentage based, markup on bike models production cost
-
-# CUSTOMER INSTANCES
-customer1 = Customer()
-customer1.name = "Bobby"
-customer1.budget = 200
-
-customer2 = Customer()
-customer2.name = "Reggie"
-customer2.budget = 500
-
-customer3 = Customer()
-customer3.name = "Charlie"
-customer3.budget = 1000
-"""
-
 if __name__ == "__main__":
-    customer1 = Customer("Bobby", 200, True)
-    print(customer1)
+    dan = Customer("dan", 200)
+    jessie = Customer("jessie", 500)
+    brock = Customer("brock", 1000)
 
+    shop = BikeShop("Blannigan's Bikes")
+
+    bike1 = Bicycle("Corvair", 20, 150)
+    bike2 = Bicycle("Airstream", 18, 200)
+    bike3 = Bicycle("Slipstream", 25, 100)
+    bike4 = Bicycle("Monty", 16, 400)
+    bike5 = Bicycle("Zuul", 10, 800)
+    bike6 = Bicycle("Ratman", 13, 650)
+
+    shop.set_inventory(bike1)
+    shop.set_inventory(bike2)
+    shop.set_inventory(bike3)
+    shop.set_inventory(bike4)
+    shop.set_inventory(bike5)
+    shop.set_inventory(bike6)
+
+    print(shop.name)
+    print(shop.show_inventory())
+
+    print("Dan's budget = $%f" % dan.money)
+    for bike in shop.show_inventory():
+        dan.bikes_avail(bike)
+    print(dan.show_bikes_avail())
+    dan.purchase()
+    print(shop.show_inventory())
+    print(shop.store_profit)
+
+    print("Jessie's budget = $%f" % jessie.money)
+    for bike in shop.show_inventory():
+        jessie.bikes_avail(bike)
+    print(jessie.show_bikes_avail())
+    jessie.purchase()
+    print(shop.show_inventory())
+    print(shop.store_profit)
     
-# Print the initial inventory of the bike shop for each bike it carries.
-# Print the name of each customer, and a list of the bikes offered by the bike
-# shop that they can afford given their budget. Make sure you price the bikes
-# in such a way that each customer can afford at least one.
-
-# Have each of the three customers purchase a bike then print the name of the
-# bike the customer purchased, the cost, and how much money they have left over in their bicycle fund.
-
-# After each customer has purchased their bike, the script should print out
-# the bicycle shop's remaining inventory for each bike, and how much profit they have made selling the three bikes.
+    print("Brock's budget = $%f" % brock.money)
+    for bike in shop.show_inventory():
+        brock.bikes_avail(bike)
+    print(brock.show_bikes_avail())
+    brock.purchase()
+    print(shop.show_inventory())
+    print(shop.store_profit)        
